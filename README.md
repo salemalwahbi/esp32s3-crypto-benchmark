@@ -41,3 +41,16 @@ This repository presents an empirical benchmarking study comparing two modern cr
 2. Open in **VS Code** with **PlatformIO** extension.
 3. Build and upload to your ESP32-S3 development board.
 4. Open Serial Monitor at `115200` baud rate to observe the real-time execution metrics.
+---
+
+## ⚠️ Methodological Limitation
+
+This benchmark compares **ChaCha20 in isolation (encryption-only)** against **Ascon-128 as a full AEAD construction (encryption + authentication tag generation)**. This is not a strictly equivalent comparison, since Ascon-128 performs additional computation per call — generating and verifying an authentication tag — that raw ChaCha20 does not.
+
+A more precise, protocol-equivalent comparison would benchmark **ChaCha20-Poly1305** (the AEAD construction actually used in WireGuard) against **Ascon-128**, since both would then provide the same security guarantees (confidentiality + integrity + authenticity). Some portion of the throughput gap reported above is therefore attributable to this difference in functional scope, not purely to raw cipher speed.
+
+---
+
+## 🔭 Ongoing Development
+
+An adaptive cipher-selection extension is currently in progress, where an on-device decision layer (a compact classifier running directly on the ESP32-S3) chooses between ChaCha20 and Ascon-128 dynamically based on runtime system metrics (free heap, battery level, payload size, and priority). Early implementation is available in a separate branch/repository.
